@@ -1,9 +1,11 @@
 # This is a JDK servic docker
 FROM alpine:3.11
 LABEL author="gclm"
-LABEL version="1.1.2"
+LABEL version="1.1.5"
 LABEL description="基于 Orale JDK 8u231封装"
 
+
+#******************基础环境配置******************
 #1.更新Alpine的软件源为阿里云，因为从默认官源拉取实在太慢了
 RUN echo http://mirrors.aliyun.com/alpine/v3.11/main/ > /etc/apk/repositories && \
     echo http://mirrors.aliyun.com/alpine/v3.11/community/ >> /etc/apk/repositories
@@ -14,9 +16,34 @@ RUN apk add tzdata && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "Asia/Shanghai" > /etc/timezone \
     && apk del tzdata
 
-#3. 添加jdk
-ADD jdk-8u231-linux-x64.tar.gz /usr/local
 
-#4. 配置环境变量 
-ENV JAVA_HOME /usr/local/jdk1.8.0_231
-ENV PATH $JAVA_HOME/bin:$PATH
+#******************Alpine安装 Glibc https://github.com/sgerrand/alpine-pkg-glibc *****************
+#3. 创建目录
+WORKDIR /usr/local/jdk
+
+#4.将一些安装包复制到镜像中，语法：ADD/COPY <src>... <dest>
+## ADD与COPY的区别：ADD复制并解压，COPY仅复制
+## glibc安装包如果从网络下载速度实在是太慢了，先提前下载复制到镜像中
+ADD jdk-8u231-linux-x64.tar.gz /usr/local/jdk/
+COPY glibc-2.31-r0.apk /usr/local/jdk/
+
+#5.运行指定的命令
+## Alpine linux为了精简本身并没有安装太多的常用软件,apk类似于ubuntu的apt-get，
+## 用来安装一些常用软V件，其语法如下：apk add bash wget curl git make vim docker
+## wget是linux下的ftp/http传输工具，没安装会报错“/bin/sh: 　　wget: not found”，网上例子少安装wget
+## ca-certificates证书服务，是安装glibc前置依赖
+RUN apk --no-cache add ca-certificates wget \
+    && wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub \
+    && apk add glibc-2.31-r0.apk  \
+    && rm -rf /var/cache/apk/* glibc-2.31-r0.apk 
+
+
+#******************设置JAVA变量环境******************
+#6.配置环境变量
+ENV JAVA_HOME=/usr/local/jdk/jdk1.8.0_231
+ENV CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+#7. 配置验证指令
+CMD ["java","-version"]
+CMD ["date","-R"]
