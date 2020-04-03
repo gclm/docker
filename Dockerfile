@@ -1,7 +1,7 @@
 # This is a JDK servic docker
 FROM centos
 LABEL author="gclm"
-LABEL version="1.0.0"
+LABEL version="1.0.2"
 LABEL description="基于 Orale JDK 8u231封装"
 
 ADD lib/jdk-8u231-linux-x64.tar.gz /usr/local
