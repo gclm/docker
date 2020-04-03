@@ -1,13 +1,8 @@
 # This is a JDK servic docker
-FROM alpine:latest
+FROM centos
 LABEL author="gclm"
-LABEL version="1.1.1"
+LABEL version="1.0.0"
 LABEL description="基于 Orale JDK 8u231封装"
-
-# 设置时区为上海
-RUN apk add tzdata && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "Asia/Shanghai" > /etc/timezone \
-    && apk del tzdata
 
 ADD jdk-8u231-linux-x64.tar.gz /usr/local
 
