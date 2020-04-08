@@ -1,7 +1,7 @@
 # This is a JDK servic docker
 FROM alpine:3.11
 LABEL author="gclm(gclm159@gmail.com)"
-LABEL version="1.2.4"
+LABEL version="1.2.5"
 LABEL description="基于 Orale 8u241 JRE 封装"
 
 #******************基础环境配置******************
@@ -32,7 +32,7 @@ COPY glibc-2.31-r0.apk /usr/local/jdk/
 ## ca-certificates证书服务，是安装glibc前置依赖
 RUN apk --no-cache add ca-certificates wget \
     && wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub \
-    && apk add lib/glibc-2.31-r0.apk  \
+    && apk add glibc-2.31-r0.apk  \
     && rm -rf /var/cache/apk/* glibc-2.31-r0.apk 
 
 
