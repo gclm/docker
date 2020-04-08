@@ -1,7 +1,7 @@
 # This is a JDK servic docker
 FROM alpine:3.11
 LABEL author="gclm(gclm159@gmail.com)"
-LABEL version="1.2.3"
+LABEL version="1.2.4"
 LABEL description="基于 Orale 8u241 JRE 封装"
 
 #******************基础环境配置******************
@@ -22,7 +22,8 @@ WORKDIR /usr/local/jdk
 #4.将一些安装包复制到镜像中，语法：ADD/COPY <src>... <dest>
 ## ADD与COPY的区别：ADD复制并解压，COPY仅复制
 ## glibc安装包如果从网络下载速度实在是太慢了，先提前下载复制到镜像中
-ADD jre-8u241-mini-linux-x64.tar.gz /usr/local/jdk/
+ADD  jre-8u241-mini-linux-x64.tar.gz /usr/local/jdk/
+COPY glibc-2.31-r0.apk /usr/local/jdk/
 
 #5.运行指定的命令
 ## Alpine linux为了精简本身并没有安装太多的常用软件,apk类似于ubuntu的apt-get，
@@ -31,8 +32,7 @@ ADD jre-8u241-mini-linux-x64.tar.gz /usr/local/jdk/
 ## ca-certificates证书服务，是安装glibc前置依赖
 RUN apk --no-cache add ca-certificates wget \
     && wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub \
-    && wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.31-r0/glibc-2.31-r0.apk \
-    && apk add glibc-2.31-r0.apk  \
+    && apk add lib/glibc-2.31-r0.apk  \
     && rm -rf /var/cache/apk/* glibc-2.31-r0.apk 
 
 
